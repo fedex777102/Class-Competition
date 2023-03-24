@@ -1,0 +1,182 @@
+---
+title: "Competetion"
+author: "Alex Federspiel"
+date: "3/26/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r packages, include = FALSE}
+  library(readr)
+  library(tidyverse)
+  library(caret)
+  library(corrplot)
+```
+
+```{r data, include = FALSE}
+  competition_train <- read_csv("C:/Users/afede/Desktop/Grad School/Data Science/CourseContentRepo/Assignments/competition/competition-train.csv")
+```
+
+```{r first 10 variables, include = FALSE}
+  mini_competetion <- competition_train %>% select(X1:X10, outcome)
+  df_mini_competetion <- data.frame(mini_competetion %>% select(- outcome))
+  mini_preprocess_fit <- preProcess(df_mini_competetion, 
+                                    method = c("BoxCox", "center", "scale"))
+  mini_preprocess <- predict(mini_preprocess_fit, df_mini_competetion)
+```
+
+## Missing Values
+No missing values.
+
+```{r missing values, echo = FALSE, warning = FALSE}
+  total_nan <- function(x) sum(is.na(x))
+  mini_competetion %>% summarise(across(everything(), total_nan))
+```
+
+
+## X1
+```{r X1, echo = FALSE}
+  summary(mini_competetion$X1)
+  ggplot(mini_competetion, aes(X1)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_competetion, aes(y = X1)) + geom_boxplot()
+```
+
+Majority of the values are $0$. Has near-zero variance. Should drop.
+
+* The fraction of unique values over the sample size is: $\frac{315}{5000}=6.3\%$. Textbook says it should be low like $10\%$.
+
+* Ratio of frequency of most prevalent value to frequency of second most is: $\frac{2969}{91}=32.62$. Textbook says it should be high like $20$.
+
+```{r sum zero, echo = FALSE}
+  head(mini_competetion %>% group_by(X1) %>% summarise(count = n()) %>% 
+    arrange(desc(count)))
+```
+
+## X2
+```{r X2}
+  summary(mini_competetion$X2)
+  ggplot(mini_competetion, aes(X2)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_preprocess, aes(X2)) + geom_histogram(color = "white", bins = 40)
+```
+
+Data looks good after preprocess.
+
+## X3
+```{r x3}
+  summary(mini_competetion$X3)
+  ggplot(mini_competetion, aes(X3)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_preprocess, aes(X3)) + geom_histogram(color = "white", bins = 40)
+```
+
+Data looks good after preprocess.
+
+## X4
+```{r x4}
+  summary(mini_competetion$X4)
+  ggplot(mini_competetion, aes(X4)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_preprocess, aes(X4)) + geom_histogram(color = "white", bins = 40)
+```
+
+Data looks good after preprocess.
+
+## X5
+```{r x5}
+  summary(mini_competetion$X5)
+  ggplot(mini_competetion, aes(X5)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_preprocess, aes(X5)) + geom_histogram(color = "white", bins = 40)
+```
+
+Data looks good after preprocess.
+
+## X6
+```{r x6}
+  summary(mini_competetion$X6)
+  ggplot(mini_competetion, aes(X6)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_competetion, aes(y = X6)) + geom_boxplot()
+  ggplot(mini_preprocess, aes(X6)) + geom_histogram(color = "white", bins = 40) +
+    labs(title = "Preprocess")
+```
+
+Not sure if we should remove or not. Looks skewed even after preprocess. The variance looks low as well.
+
+* Unique values: $\frac{204}{5000}=4.08\%$
+* Ratio of most common to second most: $\frac{1202}{584}=2.06$
+
+The ratio isn't outrageous but uniqueness is small. 
+
+## X7
+```{r x7}
+  summary(mini_competetion$X7)
+  ggplot(mini_competetion, aes(X7)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_competetion, aes(y = X7)) + geom_boxplot()
+```
+
+Near-zero variance. Most likely should drop.
+
+* Unique values: $\frac{320}{5000}=6.4\%$
+* Common Ratio: $\frac{1224}{372}=3.29$
+
+Again, ratio of most common to second isn't very large but the percent of unique values is low. 
+
+## X8
+```{r x8}
+  summary(mini_competetion$X8)
+  ggplot(mini_competetion, aes(X8)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_competetion, aes(y = X8)) + geom_boxplot()
+```
+
+Another near-zero variance. Most values are $0$.
+
+* Uniqueness: $\frac{172}{5000}=3.44\%$
+* Common Ratio: $\frac{1642}{934}=1.76$
+
+Probably drop.
+```{r, include = FALSE}
+  mini_competetion %>% group_by(X8) %>% summarise(count = n()) %>% 
+    arrange(desc(count))
+```
+
+
+## X9
+```{r x9}
+  summary(mini_competetion$X9)
+  ggplot(mini_competetion, aes(X9)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_preprocess, aes(X9)) + geom_histogram(color = "white", bins = 40)
+```
+
+Data looks good after preprocess.
+
+## X10
+```{r x10}
+  summary(mini_competetion$X10)
+  ggplot(mini_competetion, aes(X10)) + geom_histogram(color = "white", bins = 40)
+  ggplot(mini_preprocess, aes(X10)) + geom_histogram(color = "white", bins = 40)
+```
+
+```{r, include = FALSE}
+    mini_competetion %>% group_by(X10) %>% summarise(count = n()) %>% 
+    arrange(desc(count))
+```
+
+## Summary
+* Remove: X1
+* Potential Removals: X6, X7, X10
+  + These have skew and outliers. Not entirely sure what we can do about these.
+* Removed Predictors from Cutoff Matrix: X11, X12, X16, X17, X18
+
+```{r}
+  correlation_matrix <- cor(competition_train %>% select(where(is.numeric)))
+  corrplot(correlation_matrix, order = "hclust")
+  
+  predictors_only <- data.frame(competition_train %>% select(-outcome))
+  predictors_only_correlation_matrix <- cor(predictors_only)
+  cutoff <- 0.90
+  
+  names_of_predictors_to_remove <- findCorrelation(predictors_only_correlation_matrix, 
+                                                 names = TRUE, cutoff = cutoff)
+  removed_predictors <- predictors_only %>% 
+    select(-all_of(names_of_predictors_to_remove))
+```
